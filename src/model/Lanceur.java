@@ -2,8 +2,6 @@ package model;
 
 import java.util.ArrayList;
 
-import org.junit.Before;
-
 public class Lanceur {
 
 	private static Joueur j1;

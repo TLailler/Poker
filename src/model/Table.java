@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
 public class Table {
 
@@ -173,7 +174,7 @@ public class Table {
 				quinteFlushRoyale[0] = c;
 				boolean isQflush = true;
 				int nbCartes = 1;
-				while(isQflush || nbCartes < 6){
+				while(isQflush && nbCartes < 6){
 					for(Carte c2 : cartesTriees){
 						if(c2.getValeur().getValue() == c.getValeur().getValue()-1 && c2.getCouleur().getName().equals(c.getCouleur().getName())){
 							quinteFlushRoyale[nbCartes] = c2;
@@ -198,7 +199,7 @@ public class Table {
 			quinteFlush[0] = c;
 			boolean isQflush = true;
 			int nbCartes = 1;
-			while(isQflush || nbCartes < 6){
+			while(isQflush && nbCartes < 6){
 				for(Carte c2 : cartesTriees){
 					if(c2.getValeur().getValue() == c.getValeur().getValue()+1 && c2.getCouleur().getName().equals(c.getCouleur().getName())){
 						quinteFlush[nbCartes] = c2;
@@ -238,13 +239,16 @@ public class Table {
 		//Full
 		for(int i = 0; i < 5; i++){
 			Carte carte = cartesTriees.get(i);
-			ArrayList<Carte> cartes = cartesTriees;
+			ArrayList<Carte> cartes = new ArrayList<Carte>(cartesTriees);
 			ArrayList<Carte> full = new ArrayList<Carte>();
 			full.add(carte);
-			for(Carte c : cartes){
+			
+			Iterator<Carte> it = cartes.iterator();
+			while(it.hasNext()){
+				Carte c = it.next();
 				if(c.getValeur().getValue() == carte.getValeur().getValue() && !c.getCouleur().getName().equals(carte.getCouleur().getName())){
 					full.add(c);
-					cartes.remove(c);
+					it.remove();	
 				}
 			}
 			if(full.size() == 3){
@@ -265,7 +269,7 @@ public class Table {
 		
 		//Couleur
 		for(int i = 0; i < 3; i++){
-			ArrayList<Carte> cartes = cartesTriees;
+			ArrayList<Carte> cartes = new ArrayList<>(cartesTriees);
 			ArrayList<Carte> flush = new ArrayList<Carte>();
 			flush.add(cartes.get(i));
 			for(Carte carte : cartes){
@@ -280,22 +284,22 @@ public class Table {
 		
 		//Suite
 		for(int i = 0; i < 3; i++){
-			Carte carte = cartesTriees.get(i);
-			if(carte.getValeur() == Valeurs.AS){
-				cartesTriees.remove(i);
-				cartesTriees.add(carte);
-				i--;
+			ArrayList<Carte> cartes = new ArrayList<>(cartesTriees);
+			Carte carte = cartes.get(i);
+			if(carte.getValeur() == Valeurs.AS && i == 2){
+				cartes.remove(i);
+				cartes.add(carte);
 			}
 			ArrayList<Carte> quinte = new ArrayList<Carte>();			
 			quinte.add(carte);
 			boolean isQuinte = true;
 			int nbCartes = 1;
 			int nbTours = 0;
-			while(isQuinte || nbCartes < 6){
-				for(Carte c2 : cartesTriees){
+			while(isQuinte && nbCartes < 6){
+				for(Carte c2 : cartes){
 					if(!(c2.getValeur().getValue() == carte.getValeur().getValue())){
 						if(c2.getValeur().getValue() == carte.getValeur().getValue()-1){
-							quinte.set(nbCartes, c2);
+							quinte.add(c2);
 							carte = c2;
 							nbCartes++;
 						}else{
@@ -316,13 +320,15 @@ public class Table {
 		//Brelan
 		for(int i = 0; i < 5; i++){
 			Carte carte = cartesTriees.get(i);
-			ArrayList<Carte> cartes = cartesTriees;
+			ArrayList<Carte> cartes = new ArrayList<>(cartesTriees);
 			ArrayList<Carte> brelan = new ArrayList<Carte>();
 			brelan.add(carte);
-			for(Carte c : cartes){
+			Iterator<Carte> it = cartes.iterator();
+			while(it.hasNext()){
+				Carte c = it.next();
 				if(c.getValeur().getValue() == carte.getValeur().getValue() && !c.getCouleur().getName().equals(carte.getCouleur().getName())){
 					brelan.add(c);
-					cartes.remove(c);
+					it.remove();
 				}
 			}
 			if(brelan.size() == 3){
@@ -338,25 +344,31 @@ public class Table {
 		//Double Paire
 		for(int i = 0; i < 6; i++){
 			Carte carte = cartesTriees.get(i);
-			ArrayList<Carte> cartes = cartesTriees;
+			ArrayList<Carte> cartes = new ArrayList<>(cartesTriees);
 			ArrayList<Carte> doublePaire = new ArrayList<Carte>();
 			doublePaire.add(carte);
 			cartes.remove(carte);
-			for(Carte c : cartes){
+			Iterator<Carte> it = cartes.iterator();
+			while(it.hasNext()){
+				Carte c = it.next();
 				if(c.getValeur().getValue() == carte.getValeur().getValue() && !c.getCouleur().getName().equals(carte.getCouleur().getName())){
 					doublePaire.add(c);
-					cartes.remove(c);
+					it.remove();
 					break;
 				}
 			}
 			if(doublePaire.size() == 2){
-				for(Carte c2 : cartes){
+				Iterator<Carte> it2 = cartes.iterator();
+				while(it2.hasNext()){
+					Carte c2 = it2.next();
 					doublePaire.add(c2);
-					cartes.remove(c2);
-					for(Carte c3 : cartes){
+					it2.remove();
+					Iterator<Carte> it3 = cartes.iterator();
+					while(it3.hasNext()){
+					Carte c3 = it3.next();
 						if(c2.getValeur().getValue() == carte.getValeur().getValue() && !c2.getCouleur().getName().equals(carte.getCouleur().getName())){
 							doublePaire.add(c3);
-							cartes.remove(c3);
+							it3.remove();
 							break;
 						}
 					}
@@ -371,14 +383,16 @@ public class Table {
 		//Paire
 		for(int i = 0; i < 7; i++){
 			Carte carte = cartesTriees.get(i);
-			ArrayList<Carte> cartes = cartesTriees;
+			ArrayList<Carte> cartes = new ArrayList<>(cartesTriees);
 			ArrayList<Carte> doublePaire = new ArrayList<Carte>();
 			doublePaire.add(carte);
 			cartes.remove(carte);
-			for(Carte c : cartes){
+			Iterator<Carte> it = cartes.iterator();
+			while(it.hasNext()){
+				Carte c = it.next();
 				if(c.getValeur().getValue() == carte.getValeur().getValue() && !c.getCouleur().getName().equals(carte.getCouleur().getName())){
 					doublePaire.add(c);
-					cartes.remove(c);
+					it.remove();
 					break;
 				}
 			}
@@ -401,17 +415,28 @@ public class Table {
 	private void terminerManche() {
 		// TODO devoiler cartes, désigner vainqueur, reverser les mises, tout vider, lancer nouvelle manche	
 		// Montrer les cartes restantes
-		System.out.println("Dévoilement des joueurs restants : ");
+		System.out.println("Dévoilement des cartes des joueurs restants : ");
+		for (Joueur j : joueurs){
+			if(!j.isFolded()){
+				j.getMain().setCombinaison(this.determinerCombinaison(j));
+			}
+		}
 		ArrayList<Joueur> gagnant = new ArrayList<Joueur>();
+		
 		for(Joueur j : joueurs){
 			if(!j.isFolded()){
 				j.montrerMain();
-				if(gagnant.get(0).getMain().getCombinaison().compareTo(j.getMain().getCombinaison()) == -1){
-					gagnant = new ArrayList<Joueur>();
-					gagnant.add(j);
-				}else if (gagnant.get(0).getMain().getCombinaison().compareTo(j.getMain().getCombinaison()) == 0){
+				if(gagnant.size() > 0){
+					if(gagnant.get(0).getMain().getCombinaison().compareTo(j.getMain().getCombinaison()) == -1){
+						gagnant = new ArrayList<Joueur>();
+						gagnant.add(j);
+					}else if (gagnant.get(0).getMain().getCombinaison().compareTo(j.getMain().getCombinaison()) == 0){
+						gagnant.add(j);
+					}
+				}else{
 					gagnant.add(j);
 				}
+				
 			}
 		}
 		
@@ -489,22 +514,23 @@ public class Table {
 	
 	public void distribuerTurn(){
 		this.setTurn(this.paquet.tirerCarte());
-		System.out.println(this.getTurn());
+		System.out.println("Turn : " + this.getTurn());
 	}
 	
 	public void distribuerRiver(){
 		this.setRiver(this.paquet.tirerCarte());
-		System.out.println(this.getRiver());
+		System.out.println("River : " + this.getRiver());
 	}
 	
 	public void viderTable(){
-		//TODO Vider joueurs sans argent, remplir paquet ...
+		//TODO Vider joueurs sans argent, remplir paquet, retirer mains des joueurs ...
 		
 		for(int i = 0; i < joueurs.size(); i++){
 			Joueur j = joueurs.get(i);
 			if(j.getJetons() <= 0){
 				joueurs.remove(i);
 			}
+			j.setMain(null);
 		}
 		
 		this.setPaquet(new Paquet());

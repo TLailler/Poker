@@ -40,6 +40,7 @@ public class Joueur {
 		if(this.getJetons() >= montant){
 			this.setJetons(this.jetons - montant);
 			this.setMise(montant);
+			System.out.println(this.getNom() + " mise " + montant);
 		}		
 	}
 	
@@ -74,7 +75,7 @@ public class Joueur {
 			s= sc.nextLine();
 		}
 	}
-	sc.close();
+//	sc.close();
 	return s;
 	}
 	

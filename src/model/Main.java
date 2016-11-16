@@ -35,7 +35,12 @@ public class Main {
 	}
 	
 	public String toString(){
-		return(cartes[0].toString() + " - " + cartes[1].toString());
+		if(this.getCombinaison() != null){
+			return(this.getCombinaison().toString() + " => " + cartes[0].toString() + " - " + cartes[1].toString());
+		}else{
+			return(cartes[0].toString() + " - " + cartes[1].toString());
+
+		}
 	}
 	
 }
