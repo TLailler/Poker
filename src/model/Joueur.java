@@ -39,40 +39,54 @@ public class Joueur {
 	public void miser(int montant){
 		if(this.getJetons() >= montant){
 			this.setJetons(this.jetons - montant);
-			this.setMise(montant);
-			System.out.println(this.getNom() + " mise " + montant);
+			this.setMise(this.getMise() + montant);
+			System.out.println(this.getNom() + " ajoute " + montant +" // Mise totale : " + this.getMise());
 		}		
 	}
 	
-	public void recevoirCartes(Paquet p){
+	public void recevoirCartes(Paquet p){		
 		Carte[] cartes = new Carte[2];
 		cartes[0] = p.tirerCarte();
 		cartes[1] = p.tirerCarte();
-		this.main.setCartes(cartes);
+		this.setMain(new Main(cartes));
 	}
 
-	public String choisirAction() {
+	public String choisirAction(int miseMax, boolean premiereMise) {
 	Scanner sc = new Scanner(System.in);
 	String s = sc.nextLine();
 	boolean valid = false;
 	while(!valid){
-		if(s.equals("S")){
+		if(s.equals("S") && miseMax != this.getMise()){
 			valid = true;
+			System.out.println(this.getNom() + " suit");
 		}else if(s.equals("F")){
 			valid = true;
-		}else if(s.matches("^R\\d+$")){
-			String chiffre = s.substring(1,s.length()-1);
+			System.out.println(this.getNom() + " se couche");
+		}else if(s.matches("^R\\d+$") && miseMax != this.getMise()){
+			String chiffre = s.substring(1,s.length());
 			int montant = Integer.parseInt(chiffre);
 			if(montant <= this.getJetons()){
 				valid = true;
+				System.out.println(this.getNom() + " suit, et relance de " + chiffre);
 			}else{
 				//Mauvais montant
-				s = sc.nextLine();
+				System.out.println("Montant invalide, entrez un autre montant si vous voulez relancer ");
+				s = this.choisirAction(miseMax,premiereMise);
+				valid = true;
 			}
 		}else if(s.equals("A")){
 			valid = true;
+			System.out.println(this.getNom() + " met tapis !");
+		}else if(s.equals("C") && (premiereMise ||  miseMax == this.getMise())){
+			valid = true;
+			System.out.println(this.getNom() + " mise");
+		}else if(s.equals("K") && (miseMax == this.getMise())){
+			valid = true;
+			System.out.println(this.getNom() + " check");
 		}else{
-			s= sc.nextLine();
+			System.out.println("Entrez un symbole correct");
+			this.choisirAction(miseMax,premiereMise);
+			valid = true;
 		}
 	}
 //	sc.close();

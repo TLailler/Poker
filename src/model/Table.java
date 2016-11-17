@@ -56,10 +56,10 @@ public class Table {
 		paquet.melanger();
 		this.setPot(0);
 		this.decalerBlinds();
-		this.current = this.getDealerPlayer();
 		System.out.println("Dealer : " + this.getDealerPlayer().getNom());
 		System.out.println("Petite Blind : " + this.getSmallBlindPlayer().getNom());
 		System.out.println("Grosse Blind : " + this.getBigBlindPlayer().getNom());
+		this.current = this.getBigBlindPlayer().getNext();
 		this.distribuerJoueurs();
 		System.out.println("Mises obligatoires ...");
 		this.misesObligatoires();
@@ -121,26 +121,54 @@ public class Table {
 	public void encheres(){
 		System.out.println("Début du tour d'enchères...");
 		boolean misesEgales = false;
+		boolean premiereMise = true;
+		int miseMax = this.getMiseIndiv();
 		while(!misesEgales){
-			if(!this.current.isFolded()){
-				System.out.println("Au tour de "+ this.getCurrent().getNom() + " de miser");
-				String action = this.current.choisirAction();
-				if(action.equals("S")){
-					this.setPot(this.getPot()+this.getMiseIndiv());
-					this.getCurrent().miser(this.getMiseIndiv());
-				}else if(action.equals("F")){
-					this.getCurrent().setFolded(true);
-				}else if(action.matches("^R\\d+")){
-					Integer chiffre = Integer.parseInt(action.substring(1,action.length()-1));
-					this.setPot(this.getMiseIndiv() + chiffre);
-					this.getCurrent().miser(this.getMiseIndiv() + chiffre);
-				}else if(action.equals("A")){
-					this.setPot(this.getCurrent().getJetons());
-					this.getCurrent().miser(this.getCurrent().getJetons());
+			for(Joueur j : joueurs){//On fait a chaque fois le tour des joueurs
+				if(nbJoueursNonCouches() > 1){				
+					if(!this.current.isFolded()){ // Gérer plus qu'un joueur
+						System.out.println("Au tour de "+ this.getCurrent().getNom() + " de miser");
+						System.out.println("Mise actuelle : "+ this.getCurrent().getMise());
+						String action = this.current.choisirAction(miseMax, premiereMise);
+						if(action.equals("S")){ // Suivre
+							this.setPot(this.getPot()+miseMax - this.getCurrent().getMise());
+							this.getCurrent().miser(miseMax - this.getCurrent().getMise());
+							premiereMise = false;
+							
+						}else if(action.equals("F")){//Se Coucher //TODO gerer fold
+							this.getCurrent().setFolded(true);
+							
+						}else if(action.matches("^R\\d+")){// Relance
+							Integer chiffre = Integer.parseInt(action.substring(1,action.length()));
+							this.setPot(this.getPot() + miseMax - this.getCurrent().getMise() + chiffre);
+							this.setMiseIndiv(miseMax - this.getCurrent().getMise() + chiffre);
+							this.getCurrent().miser(miseMax - this.getCurrent().getMise() + chiffre);
+							miseMax = this.getCurrent().getMise();
+							premiereMise = false;
+							
+						}else if(action.equals("A")){ //All in //TODO gerer all in
+							this.setPot(this.getPot() + this.getCurrent().getJetons());
+							this.setMiseIndiv(this.getCurrent().getJetons());
+							this.getCurrent().miser(this.getCurrent().getJetons());
+							miseMax = this.getCurrent().getMise();
+							premiereMise = false;
+							
+						}else if(action.equals("C")){ //Call
+							this.setPot(this.getPot()+this.getMiseIndiv());
+							this.getCurrent().miser(this.getMiseIndiv());
+							miseMax = this.getCurrent().getMise();
+							premiereMise = false;
+							
+						}else if(action.equals("K")){ //Check
+							
+						}
+						misesEgales = this.verifierMisesEgales();
+					}	
+					this.current = this.current.getNext();
+				}else{
+					misesEgales = true;
 				}
-				misesEgales = this.verifierMisesEgales();
-			}	
-			this.current = this.current.getNext();
+			}			
 		}
 	}
 	
@@ -362,20 +390,23 @@ public class Table {
 				while(it2.hasNext()){
 					Carte c2 = it2.next();
 					doublePaire.add(c2);
-					it2.remove();
+					//it2.remove();
 					Iterator<Carte> it3 = cartes.iterator();
 					while(it3.hasNext()){
 					Carte c3 = it3.next();
 						if(c2.getValeur().getValue() == carte.getValeur().getValue() && !c2.getCouleur().getName().equals(carte.getCouleur().getName())){
 							doublePaire.add(c3);
-							it3.remove();
+							//it3.remove();
 							break;
 						}
 					}
 					if(doublePaire.size() == 4){
-						doublePaire.add(c2);
 						return new Combinaison(doublePaire.toArray(new Carte[5]), Combinaisons.DEUX_PAIRES);
-					}					
+					}else{
+						doublePaire.remove(c2);
+						//cartes.add(c2);
+						//Collections.sort(cartes,Collections.reverseOrder());
+					}
 				}
 			}		
 		}
@@ -471,6 +502,16 @@ public class Table {
 		return this.joueurs.size();
 	}
 	
+	private int nbJoueursNonCouches(){
+		int i = 0;
+		for(Joueur j : joueurs){
+			if(!j.isFolded()){
+				i++;
+			}
+		}
+		return i;
+	}
+	
 	private void decalerBlinds() {
 		for(Joueur j : joueurs){
 			if(j.isDealer()){
@@ -523,7 +564,7 @@ public class Table {
 	}
 	
 	public void viderTable(){
-		//TODO Vider joueurs sans argent, remplir paquet, retirer mains des joueurs ...
+		//Vider joueurs sans argent, remplir paquet, retirer mains des joueurs, retirer mise des joueurs, remettre en jeu les joueurs couchés ...
 		
 		for(int i = 0; i < joueurs.size(); i++){
 			Joueur j = joueurs.get(i);
@@ -531,6 +572,8 @@ public class Table {
 				joueurs.remove(i);
 			}
 			j.setMain(null);
+			j.setMise(0);
+			j.setFolded(false);
 		}
 		
 		this.setPaquet(new Paquet());

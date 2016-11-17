@@ -40,7 +40,7 @@ public class Carte implements Comparable<Carte> {
 
 	@Override
 	public String toString() {
-		return "Carte [valeur=" + valeur.name() + ", couleur=" + couleur.name() + ", isOuverte=" + isOuverte + "]";
+		return "Carte [valeur=" + valeur.name() + ", couleur=" + couleur.name() + "]";
 	}
 
 	@Override

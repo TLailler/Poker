@@ -47,19 +47,19 @@ public class PokerTest extends TestCase {
 	 * Test de la saisie utilisateur choisirAction()
 	 * A executer manuellement dans un main
 	 */
-	public void testActionEnchères(){
-		System.out.println("Action : S pour suivre, R pour augmenter sa mise, F pour se coucher");
-		String s = j1.choisirAction();
-		if(s.equals("S")){
-			System.out.println("Suivi");
-		}else if(s.equals("F")){
-			System.out.println("Couché");
-		}else if(s.equals("R")){
-			System.out.println("Relance");
-		}else{
-			System.out.println("Mauvais choix");
-		}
-		assertTrue(s == "S" && s == "F" && s == "R" && s == "Mauvais choix");	
-	}
+//	public void testActionEnchères(){
+//		System.out.println("Action : S pour suivre, R pour augmenter sa mise, F pour se coucher");
+//		String s = j1.choisirAction();
+//		if(s.equals("S")){
+//			System.out.println("Suivi");
+//		}else if(s.equals("F")){
+//			System.out.println("Couché");
+//		}else if(s.equals("R")){
+//			System.out.println("Relance");
+//		}else{
+//			System.out.println("Mauvais choix");
+//		}
+//		assertTrue(s == "S" && s == "F" && s == "R" && s == "Mauvais choix");	
+//	}
 
 }
