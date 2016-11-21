@@ -123,9 +123,8 @@ public class Table {
 		boolean misesEgales = false;
 		boolean premiereMise = true;
 		int miseMax = this.getMiseIndiv();
-		while(!misesEgales){
-			for(Joueur j : joueurs){//On fait a chaque fois le tour des joueurs
-				if(nbJoueursNonCouches() > 1){				
+		while(!misesEgales && nbJoueursNonCouches() > 1){
+			for(Joueur j : joueurs){//On fait a chaque fois le tour des joueurs			
 					if(!this.current.isFolded()){ // Gérer plus qu'un joueur
 						System.out.println("Au tour de "+ this.getCurrent().getNom() + " de miser");
 						System.out.println("Mise actuelle : "+ this.getCurrent().getMise());
@@ -135,7 +134,7 @@ public class Table {
 							this.getCurrent().miser(miseMax - this.getCurrent().getMise());
 							premiereMise = false;
 							
-						}else if(action.equals("F")){//Se Coucher //TODO gerer fold
+						}else if(action.equals("F")){//Se Coucher
 							this.getCurrent().setFolded(true);
 							
 						}else if(action.matches("^R\\d+")){// Relance
@@ -165,9 +164,6 @@ public class Table {
 						misesEgales = this.verifierMisesEgales();
 					}	
 					this.current = this.current.getNext();
-				}else{
-					misesEgales = true;
-				}
 			}			
 		}
 	}
@@ -197,24 +193,16 @@ public class Table {
 		for(int i = 0; i < 3; i++){
 			Carte carte = cartesTriees.get(i);
 			if(carte.getValeur() == Valeurs.AS){
-				Carte[] quinteFlushRoyale = new Carte[5];
-				Carte c = carte;
-				quinteFlushRoyale[0] = c;
-				boolean isQflush = true;
-				int nbCartes = 1;
-				while(isQflush && nbCartes < 6){
-					for(Carte c2 : cartesTriees){
-						if(c2.getValeur().getValue() == c.getValeur().getValue()-1 && c2.getCouleur().getName().equals(c.getCouleur().getName())){
-							quinteFlushRoyale[nbCartes] = c2;
-							c = c2;
-							nbCartes++;
-						}else{
-							isQflush = false;
-						}
+				ArrayList<Carte> quinteFlushRoyale = new ArrayList<Carte>();
+				quinteFlushRoyale.add(carte);
+				for(int k = i+1; k < cartesTriees.size(); k++){
+					if(cartesTriees.get(k).getValeur().getValue() == carte.getValeur().getValue()-1 && cartesTriees.get(k).getCouleur().getName().equals(carte.getCouleur().getName())){
+						quinteFlushRoyale.add(cartesTriees.get(k));
+						carte = cartesTriees.get(k);
 					}
-				}
-				if(isQflush){
-					return new Combinaison(quinteFlushRoyale, Combinaisons.QUINTE_FLUSH_ROYALE);
+				}				
+				if(quinteFlushRoyale.size() == 5){
+					return new Combinaison(quinteFlushRoyale.toArray(new Carte[5]), Combinaisons.QUINTE_FLUSH_ROYALE);
 				}
 			}
 		}
@@ -222,24 +210,16 @@ public class Table {
 		//Quinte Flush
 		for(int i = 0; i < 3; i++){
 			Carte carte = cartesTriees.get(i);
-			Carte[] quinteFlush = new Carte[5];
-			Carte c = carte;
-			quinteFlush[0] = c;
-			boolean isQflush = true;
-			int nbCartes = 1;
-			while(isQflush && nbCartes < 6){
-				for(Carte c2 : cartesTriees){
-					if(c2.getValeur().getValue() == c.getValeur().getValue()+1 && c2.getCouleur().getName().equals(c.getCouleur().getName())){
-						quinteFlush[nbCartes] = c2;
-						c = c2;
-						nbCartes++;
-					}else{
-						isQflush = false;
-					}
+			ArrayList<Carte> quinteFlush = new ArrayList<Carte>();
+			quinteFlush.add(carte);
+			for(int k = i+1; k < cartesTriees.size(); k++){
+				if(cartesTriees.get(k).getValeur().getValue() == carte.getValeur().getValue()-1 && cartesTriees.get(k).getCouleur().getName().equals(carte.getCouleur().getName())){
+					quinteFlush.add(cartesTriees.get(k));
+					carte = cartesTriees.get(k);
 				}
-			}
-			if(isQflush){
-				return new Combinaison(quinteFlush, Combinaisons.QUINTE_FLUSH);
+			}				
+			if(quinteFlush.size() == 5){
+				return new Combinaison(quinteFlush.toArray(new Carte[5]), Combinaisons.QUINTE_FLUSH);
 			}
 		}
 		
@@ -270,7 +250,7 @@ public class Table {
 			ArrayList<Carte> cartes = new ArrayList<Carte>(cartesTriees);
 			ArrayList<Carte> full = new ArrayList<Carte>();
 			full.add(carte);
-			
+			cartes.remove(carte);
 			Iterator<Carte> it = cartes.iterator();
 			while(it.hasNext()){
 				Carte c = it.next();
@@ -281,9 +261,9 @@ public class Table {
 			}
 			if(full.size() == 3){
 				for(Carte c2 : cartes){
-					full.add(c2);
 					for(Carte c3 : cartes){
-						if(c2.getValeur().getValue() == carte.getValeur().getValue() && !c2.getCouleur().getName().equals(carte.getCouleur().getName())){
+						if(c2.getValeur().getValue() == c3.getValeur().getValue() && !c2.getCouleur().getName().equals(c3.getCouleur().getName())){
+							full.add(c2);
 							full.add(c3);
 							break;
 						}
@@ -301,7 +281,7 @@ public class Table {
 			ArrayList<Carte> flush = new ArrayList<Carte>();
 			flush.add(cartes.get(i));
 			for(Carte carte : cartes){
-				if(!(carte.getValeur().getValue() == carte.getValeur().getValue()) && carte.getCouleur().getName().equals(carte.getCouleur().getName())){
+				if(carte.getValeur().getValue() != cartes.get(i).getValeur().getValue() && carte.getCouleur().getName().equals(cartes.get(i).getCouleur().getName())){
 					flush.add(carte);
 					if(flush.size() == 5){
 						return new Combinaison(flush.toArray(new Carte[5]), Combinaisons.COULEUR);
@@ -312,36 +292,17 @@ public class Table {
 		
 		//Suite
 		for(int i = 0; i < 3; i++){
-			ArrayList<Carte> cartes = new ArrayList<>(cartesTriees);
-			Carte carte = cartes.get(i);
-			if(carte.getValeur() == Valeurs.AS && i == 2){
-				cartes.remove(i);
-				cartes.add(carte);
-			}
-			ArrayList<Carte> quinte = new ArrayList<Carte>();			
-			quinte.add(carte);
-			boolean isQuinte = true;
-			int nbCartes = 1;
-			int nbTours = 0;
-			while(isQuinte && nbCartes < 6){
-				for(Carte c2 : cartes){
-					if(!(c2.getValeur().getValue() == carte.getValeur().getValue())){
-						if(c2.getValeur().getValue() == carte.getValeur().getValue()-1){
-							quinte.add(c2);
-							carte = c2;
-							nbCartes++;
-						}else{
-							isQuinte = false;
-						}
-					}				
+			Carte carte = cartesTriees.get(i);
+			ArrayList<Carte> quinteFlush = new ArrayList<Carte>();
+			quinteFlush.add(carte);
+			for(int k = i+1; k < cartesTriees.size(); k++){
+				if(cartesTriees.get(k).getValeur().getValue() == carte.getValeur().getValue()-1){
+					quinteFlush.add(cartesTriees.get(k));
+					carte = cartesTriees.get(k);
 				}
-				nbTours++;
-				if(nbTours == 7){
-					break;
-				}
-			}
-			if(isQuinte && quinte.size() == 5){
-				return new Combinaison(quinte.toArray(new Carte[5]), Combinaisons.SUITE);
+			}				
+			if(quinteFlush.size() == 5){
+				return new Combinaison(quinteFlush.toArray(new Carte[5]), Combinaisons.SUITE);
 			}
 		}
 		
@@ -370,7 +331,7 @@ public class Table {
 		}
 		
 		//Double Paire
-		for(int i = 0; i < 6; i++){
+		for(int i = 0; i < 4; i++){
 			Carte carte = cartesTriees.get(i);
 			ArrayList<Carte> cartes = new ArrayList<>(cartesTriees);
 			ArrayList<Carte> doublePaire = new ArrayList<Carte>();
@@ -390,22 +351,27 @@ public class Table {
 				while(it2.hasNext()){
 					Carte c2 = it2.next();
 					doublePaire.add(c2);
-					//it2.remove();
 					Iterator<Carte> it3 = cartes.iterator();
+					Carte cSave = null;
 					while(it3.hasNext()){
-					Carte c3 = it3.next();
-						if(c2.getValeur().getValue() == carte.getValeur().getValue() && !c2.getCouleur().getName().equals(carte.getCouleur().getName())){
+						Carte c3 = it3.next();
+						if(c2.getValeur().getValue() == c3.getValeur().getValue() && !c2.getCouleur().getName().equals(c3.getCouleur().getName())){
+							cSave = c3;
 							doublePaire.add(c3);
-							//it3.remove();
 							break;
 						}
 					}
 					if(doublePaire.size() == 4){
+						int in = 0;
+						while(doublePaire.size() < 5){
+							if(!(cartes.get(in) == c2 || cartes.get(in) == cSave)){
+								doublePaire.add(cartes.get(in));
+								break;
+							}
+						}					
 						return new Combinaison(doublePaire.toArray(new Carte[5]), Combinaisons.DEUX_PAIRES);
 					}else{
 						doublePaire.remove(c2);
-						//cartes.add(c2);
-						//Collections.sort(cartes,Collections.reverseOrder());
 					}
 				}
 			}		
@@ -444,7 +410,6 @@ public class Table {
 	}
 	
 	private void terminerManche() {
-		// TODO devoiler cartes, désigner vainqueur, reverser les mises, tout vider, lancer nouvelle manche	
 		// Montrer les cartes restantes
 		System.out.println("Dévoilement des cartes des joueurs restants : ");
 		for (Joueur j : joueurs){
@@ -474,10 +439,15 @@ public class Table {
 		//Les gagnants sont dans l'ArrayList gagnants
 		System.out.println("Gagnant(s) de la manche : ");
 		//Remise des gains
+		int prix = this.getPot()/gagnant.size();
 		for(Joueur j : gagnant){
 			System.out.println(j.getNom() + " avec " + j.getMain().getCombinaison().toString());
-			j.verserGains(this.getPot()/gagnant.size());
+			j.verserGains(prix);
 		}
+		if(gagnant.size() > 1)
+			System.out.println("Chaque joueur remporte " + prix + " jetons");
+		else
+			System.out.println(gagnant.get(0).getNom() + " remporte " + prix + " jetons");
 		
 		//Vider la table
 		this.viderTable();
@@ -485,6 +455,12 @@ public class Table {
 		//Nouvelle manche
 		if(nbJoueursValides() > 1)
 			this.lancerManche();
+		else
+			this.terminerPartie();
+	}
+	
+	private void terminerPartie(){
+		//TODO Terminer partie si un seul joueur restant
 	}
 	
 	private boolean verifierMisesEgales() {
