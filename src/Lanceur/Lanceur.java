@@ -1,6 +1,10 @@
-package model;
+package Lanceur;
 
 import java.util.ArrayList;
+
+import model.Joueur;
+import model.Paquet;
+import model.Table;
 
 public class Lanceur {
 
