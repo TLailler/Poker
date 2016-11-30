@@ -69,7 +69,6 @@ public class PokerTest extends TestCase {
 		t.setTurn(c4);
 		t.setRiver(c5);
 		j1.getMain().setCombinaison(t.determinerCombinaison(j1));
-		System.out.println(j1.getMain().getCombinaison().getValeur().toString());
 		assertTrue(j1.getMain().getCombinaison().getValeur() == Combinaisons.QUINTE_FLUSH_ROYALE);
 		
 	}	
@@ -94,7 +93,6 @@ public class PokerTest extends TestCase {
 		t.setTurn(c4);
 		t.setRiver(c5);
 		j1.getMain().setCombinaison(t.determinerCombinaison(j1));
-		System.out.println(j1.getMain().getCombinaison().getValeur().toString());
 		assertTrue(j1.getMain().getCombinaison().getValeur() == Combinaisons.QUINTE_FLUSH);
 		
 	}	
@@ -119,7 +117,6 @@ public class PokerTest extends TestCase {
 		t.setTurn(c4);
 		t.setRiver(c5);
 		j1.getMain().setCombinaison(t.determinerCombinaison(j1));
-		System.out.println(j1.getMain().getCombinaison().getValeur().toString());
 		assertTrue(j1.getMain().getCombinaison().getValeur() == Combinaisons.CARRE);
 		
 	}
@@ -144,7 +141,6 @@ public class PokerTest extends TestCase {
 		t.setTurn(c4);
 		t.setRiver(c5);
 		j1.getMain().setCombinaison(t.determinerCombinaison(j1));
-		System.out.println(j1.getMain().getCombinaison().getValeur().toString());
 		assertTrue(j1.getMain().getCombinaison().getValeur() == Combinaisons.FULL);
 		
 	}
@@ -169,7 +165,6 @@ public class PokerTest extends TestCase {
 		t.setTurn(c4);
 		t.setRiver(c5);
 		j1.getMain().setCombinaison(t.determinerCombinaison(j1));
-		System.out.println(j1.getMain().getCombinaison().getValeur().toString());
 		assertTrue(j1.getMain().getCombinaison().getValeur() == Combinaisons.COULEUR);
 		
 	}
@@ -194,7 +189,6 @@ public class PokerTest extends TestCase {
 		t.setTurn(c4);
 		t.setRiver(c5);
 		j1.getMain().setCombinaison(t.determinerCombinaison(j1));
-		System.out.println(j1.getMain().getCombinaison().getValeur().toString());
 		assertTrue(j1.getMain().getCombinaison().getValeur() == Combinaisons.SUITE);
 		
 	}
@@ -219,7 +213,6 @@ public class PokerTest extends TestCase {
 		t.setTurn(c4);
 		t.setRiver(c5);
 		j1.getMain().setCombinaison(t.determinerCombinaison(j1));
-		System.out.println(j1.getMain().getCombinaison().getValeur().toString());
 		assertTrue(j1.getMain().getCombinaison().getValeur() == Combinaisons.BRELAN);
 		
 	}
@@ -244,7 +237,6 @@ public class PokerTest extends TestCase {
 		t.setTurn(c4);
 		t.setRiver(c5);
 		j1.getMain().setCombinaison(t.determinerCombinaison(j1));
-		System.out.println(j1.getMain().getCombinaison().getValeur().toString());
 		assertTrue(j1.getMain().getCombinaison().getValeur() == Combinaisons.DEUX_PAIRES);
 		
 	}
@@ -269,7 +261,6 @@ public class PokerTest extends TestCase {
 		t.setTurn(c4);
 		t.setRiver(c5);
 		j1.getMain().setCombinaison(t.determinerCombinaison(j1));
-		System.out.println(j1.getMain().getCombinaison().getValeur().toString());
 		assertTrue(j1.getMain().getCombinaison().getValeur() == Combinaisons.PAIRE);
 		
 	}

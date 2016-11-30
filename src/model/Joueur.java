@@ -26,6 +26,8 @@ public class Joueur {
 	
 	private boolean isFolded;
 	
+	private boolean isAllIn;
+	
 	public Joueur(String nom, int jetons, String iPAddress, int port, Joueur next) {
 		super();
 		this.nom = nom;
@@ -34,6 +36,8 @@ public class Joueur {
 		this.port = port;
 		this.next = next;
 		this.main = new Main();
+		this.isAllIn = false;
+		this.isFolded = false;
 	}
 	
 	public void miser(int montant){
@@ -52,6 +56,11 @@ public class Joueur {
 	}
 
 	public String choisirAction(int miseMax, boolean premiereMise) {
+	if(miseMax == this.getMise()){
+		System.out.println("Action possibles : C (Call), F (Fold), A (All In), K (Check)");
+	}else{
+		System.out.println("Actions possibles : S (Suivre), F (Fold), A (All In), RXX (Relance, XX est le montant de la relance)");
+	}
 	Scanner sc = new Scanner(System.in);
 	String s = sc.nextLine();
 	boolean valid = false;
@@ -85,18 +94,14 @@ public class Joueur {
 			System.out.println(this.getNom() + " check");
 		}else{
 			System.out.println("Entrez un symbole correct");
-			this.choisirAction(miseMax,premiereMise);
+			s = this.choisirAction(miseMax,premiereMise);
 			valid = true;
 		}
 	}
-//	sc.close();
 	return s;
 	}
 	
 	public void montrerMain(){
-		for(Carte c : this.getMain().getCartes()){
-			c.setOuverte(true);
-		}
 		System.out.println(this.getNom() + " : " + this.getMain().toString());
 	}
 	
@@ -126,6 +131,14 @@ public class Joueur {
 
 	public void setFolded(boolean isFolded) {
 		this.isFolded = isFolded;
+	}
+
+	public boolean isAllIn() {
+		return isAllIn;
+	}
+
+	public void setAllIn(boolean isAllIn) {
+		this.isAllIn = isAllIn;
 	}
 
 	public int getJetons() {

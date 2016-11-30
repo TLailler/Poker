@@ -6,8 +6,6 @@ public class Carte implements Comparable<Carte> {
 	
 	private Couleurs couleur;
 	
-	private boolean isOuverte;
-	
 
 	public Valeurs getValeur() {
 		return valeur;
@@ -24,14 +22,6 @@ public class Carte implements Comparable<Carte> {
 	public void setCouleur(Couleurs couleur) {
 		this.couleur = couleur;
 	}
-
-	public boolean isOuverte() {
-		return isOuverte;
-	}
-
-	public void setOuverte(boolean isOuverte) {
-		this.isOuverte = isOuverte;
-	}
 	
 	public Carte(Valeurs val, Couleurs coul){
 		this.valeur = val;
@@ -40,7 +30,7 @@ public class Carte implements Comparable<Carte> {
 
 	@Override
 	public String toString() {
-		return "Carte [valeur=" + valeur.name() + ", couleur=" + couleur.name() + "]";
+		return "["+ valeur.name() + ", " + couleur.name() + "]";
 	}
 
 	@Override

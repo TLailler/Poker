@@ -1,7 +1,5 @@
 package model;
 
-import java.util.ArrayList;
-
 public class Main {
 
 	private Combinaison combinaison;
@@ -36,7 +34,7 @@ public class Main {
 	
 	public String toString(){
 		if(this.getCombinaison() != null){
-			return(this.getCombinaison().toString() + " => " + cartes[0].toString() + " - " + cartes[1].toString());
+			return(this.getCombinaison().toString());
 		}else{
 			return(cartes[0].toString() + " - " + cartes[1].toString());
 

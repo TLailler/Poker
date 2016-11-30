@@ -38,8 +38,8 @@ public class Table {
 	}
 	
 	public void lancerPartie(){
-		System.out.println("Début de la partie ...");
-		int index = (int)Math.random()*(joueurs.size());
+		System.out.println("////////////////// Début de la partie //////////////////");
+		int index = (int)(Math.random()*(joueurs.size()));
 		joueurs.get(index).setDealer(true);
 		joueurs.get(index).getNext().setSmallBlind(true);
 		joueurs.get(index).getNext().getNext().setBigBlind(true);
@@ -52,7 +52,7 @@ public class Table {
 	}
 	
 	public void lancerManche(){
-		System.out.println("Début de la manche ...");
+		System.out.println("////////////////// Début de la manche //////////////////");
 		paquet.melanger();
 		this.setPot(0);
 		this.decalerBlinds();
@@ -117,23 +117,31 @@ public class Table {
 		this.ajouterAuPot(this.getSmallBlind() + this.getBigBlind());
 		this.setMiseIndiv(this.getBigBlind());
 	}
+	
 
 	public void encheres(){
 		System.out.println("Début du tour d'enchères...");
 		boolean misesEgales = false;
 		boolean premiereMise = true;
 		int miseMax = this.getMiseIndiv();
-		while(!misesEgales && nbJoueursNonCouches() > 1){
-			for(Joueur j : joueurs){//On fait a chaque fois le tour des joueurs			
-					if(!this.current.isFolded()){ // Gérer plus qu'un joueur
+		while(!misesEgales && nbJoueursNonCouches() > 1 && nbJoueursNonTapis() > 0){
+				for(int i = 0; i < joueurs.size(); i++){
+					if(!this.current.isAllIn() && !this.current.isFolded()){
 						System.out.println("Au tour de "+ this.getCurrent().getNom() + " de miser");
 						System.out.println("Mise actuelle : "+ this.getCurrent().getMise());
+						
 						String action = this.current.choisirAction(miseMax, premiereMise);
+						
 						if(action.equals("S")){ // Suivre
-							this.setPot(this.getPot()+miseMax - this.getCurrent().getMise());
-							this.getCurrent().miser(miseMax - this.getCurrent().getMise());
-							premiereMise = false;
-							
+							if(this.current.getMise() + this.current.getJetons() < miseMax){
+								this.setPot(this.getPot()+ this.getCurrent().getJetons());
+								this.getCurrent().miser(this.getCurrent().getJetons());
+								premiereMise = false;
+							}else{
+								this.setPot(this.getPot()+miseMax - this.getCurrent().getMise());
+								this.getCurrent().miser(miseMax - this.getCurrent().getMise());
+								premiereMise = false;
+							}												
 						}else if(action.equals("F")){//Se Coucher
 							this.getCurrent().setFolded(true);
 							
@@ -145,12 +153,13 @@ public class Table {
 							miseMax = this.getCurrent().getMise();
 							premiereMise = false;
 							
-						}else if(action.equals("A")){ //All in //TODO gerer all in
+						}else if(action.equals("A")){ //All in
 							this.setPot(this.getPot() + this.getCurrent().getJetons());
 							this.setMiseIndiv(this.getCurrent().getJetons());
 							this.getCurrent().miser(this.getCurrent().getJetons());
 							miseMax = this.getCurrent().getMise();
 							premiereMise = false;
+							this.getCurrent().setAllIn(true);
 							
 						}else if(action.equals("C")){ //Call
 							this.setPot(this.getPot()+this.getMiseIndiv());
@@ -161,10 +170,13 @@ public class Table {
 						}else if(action.equals("K")){ //Check
 							
 						}
-						misesEgales = this.verifierMisesEgales();
+						if(this.getCurrent().getJetons() == 0){
+							this.getCurrent().setAllIn(true);
+						}
+						misesEgales = this.verifierMisesEgales(miseMax);
 					}	
-					this.current = this.current.getNext();
-			}			
+					this.current = this.current.getNext();					
+				}
 		}
 	}
 	
@@ -188,7 +200,7 @@ public class Table {
 		Collections.sort(cartesTriees, Collections.reverseOrder());
 		
 		//Verifier si quinte flush, sinon descendre jusqu'a la paire
-		
+
 		//Quinte Flush Royale
 		for(int i = 0; i < 3; i++){
 			Carte carte = cartesTriees.get(i);
@@ -460,12 +472,11 @@ public class Table {
 	}
 	
 	private void terminerPartie(){
-		//TODO Terminer partie si un seul joueur restant
+		System.out.println(joueurs.get(0).getNom() + " a remporté la partie !");
 	}
 	
-	private boolean verifierMisesEgales() {
+	private boolean verifierMisesEgales(int mise) {
 		boolean ret = true;
-		int mise = joueurs.get(0).getMise();
 		for(Joueur j : joueurs){
 			if(j.getMise() != mise && !j.isFolded()){
 				ret = false;
@@ -488,28 +499,28 @@ public class Table {
 		return i;
 	}
 	
+	private int nbJoueursNonTapis(){
+		int i = 0;
+		for(Joueur j : joueurs){
+			if(!j.isAllIn()){
+				i++;
+			}
+		}
+		return i;
+	}
+	
 	private void decalerBlinds() {
 		for(Joueur j : joueurs){
 			if(j.isDealer()){
 				j.setDealer(false);
 				j.getNext().setDealer(true);
+				j.getNext().setSmallBlind(false);
+				j.getNext().getNext().setSmallBlind(true);
+				j.getNext().getNext().setBigBlind(false);
+				j.getNext().getNext().getNext().setBigBlind(true);
 				break;
 			}
-		}		
-		for(Joueur j : joueurs){
-			if(j.isSmallBlind()){
-				j.setSmallBlind(false);
-				j.getNext().setSmallBlind(true);
-				break;
-			}
-		}
-		for(Joueur j : joueurs){
-			if(j.isBigBlind()){
-				j.setBigBlind(false);
-				j.getNext().setBigBlind(true);
-				break;
-			}
-		}		
+		}				
 	}
 
 	public void distribuerJoueurs(){
@@ -545,11 +556,19 @@ public class Table {
 		for(int i = 0; i < joueurs.size(); i++){
 			Joueur j = joueurs.get(i);
 			if(j.getJetons() <= 0){
+				System.out.println(j.getNom() + " a perdu !");
+				if(i > 0){
+					joueurs.get(i-1).setNext(j.getNext());
+				}else{
+					joueurs.get(joueurs.size()-1).setNext(j.getNext());
+				}
 				joueurs.remove(i);
+				i--;
 			}
 			j.setMain(null);
 			j.setMise(0);
 			j.setFolded(false);
+			j.setAllIn(false);
 		}
 		
 		this.setPaquet(new Paquet());
